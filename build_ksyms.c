@@ -18,6 +18,7 @@
 #include <link.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include <ctype.h>
 
 #define MAX_KSYMS 100000
 #define MAX_SHDRS 64
@@ -179,6 +180,11 @@ static size_t calculate_symtab_size(struct metadata *meta)
 		s = get_line_by_offset(meta->symfile, foff);
 		sscanf(s, "%lx %c %s", &vaddr, &ch, name);
 		kallsyms_entry[c].size = vaddr - sysmap_entry.addr;
+		if(c>MAX_KSYMS-1){
+			puts("Too many kernel symbols !");
+			puts("Try modifying the macro MAX_KSYMS in build_ksyms.c and recompile !");
+			exit(-1);
+		}
 	}
 	
 	meta->ksymcount = c;
